@@ -6,11 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: AaronSeibert/charts-seibert-family
-          path: helm-docs
-          ref: main
       - uses: actions/setup-go@v5
         with:
           go-version: '1.22'
@@ -23,8 +18,17 @@ jobs:
           merge-multiple: true
       - name: Update Chart.yaml
         run: cat artifacts/Chart.yaml > Chart.yaml
+      - name: Replace Template Values
+        run: |
+          sed -i "s|GITHUB_SERVER|${GITHUB_SERVER_URL}|g" ./readme-templates/common.gotmpl
+          sed -i "s|GITHUB_REPO|${GITHUB_REPOSITORY}|g" ./readme-templates/common.gotmpl
+          sed -i "s|REPO_OWNER|${GITHUB_REPOSITORY_OWNER}|g" ./readme-templates/common.gotmpl
       - name: Generate README.md
-        run: $HOME/go/bin/helm-docs -t ./helm-docs/templates/common.gotmpl -t ./helm-docs/templates/chart.gotmpl
+        run: |
+          $HOME/go/bin/helm-docs \
+            -t ./readme-templates/common.gotmpl \
+            -t ./readme-templates/charts.gotmpl \
+            -t ./readme-templates/README.md.gotmpl
       - name: Upload readme for other flows 
         uses: actions/upload-artifact@v4
         with:
