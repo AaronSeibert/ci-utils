@@ -17,9 +17,9 @@ jobs:
           ref: 'main'
           fetch-depth: '0'
           fetch-tags: 'true'
-      - run: pip install -r ./.build/requirements.txt
+      - run: pip install -r ./ci-utils/auto-versioning/requirements.txt
       - id: version
-        run: echo "version=$(python ./.build/bump_version.py)" >> $GITHUB_OUTPUT
+        run: echo "version=$(python ./ci-utils/auto-versioning/bump_version.py)" >> $GITHUB_OUTPUT
   update-version:
     runs-on: ubuntu-latest
     needs: bump-version
